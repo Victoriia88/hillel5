@@ -1,0 +1,26 @@
+.content {
+  display: flex;
+  justify-content: space-between;
+}
+.categories {
+  float: left;
+  width: 33%;
+  padding: 20px;
+  background-color: #fff;
+  margin: 20px 0;
+}
+
+.products {
+  float: left;
+  width: 33%;
+  padding: 20px;
+  background-color: #fff;
+  margin: auto;
+}
+
+.product-info {
+  float: left;
+  width: 33%;
+  padding: 20px;
+  background-color: #fff;
+}
