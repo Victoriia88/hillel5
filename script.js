@@ -10,10 +10,8 @@ const orderForm = document.getElementById("order-form");
 const citySelect = document.getElementById("city");
 const cityOtherInput = document.getElementById("city-other");
 
-// Отримуємо збережені замовлення з localStorage
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
 
-// Функція оновлення списку замовлень
 function updateOrderList() {
   orderListUl.innerHTML = "";
   orders.forEach((order, index) => {
@@ -136,7 +134,6 @@ function showOrderForm(productName, productPrice) {
     productsDiv.style.display = "none";
     productInfoDiv.style.display = "none";
 
-    // Відображення форми для замовлення
     orderFormDiv.style.display = "block";
   }
 }
@@ -200,7 +197,6 @@ orderForm.addEventListener("submit", function (e) {
   const date = new Date().toLocaleDateString();
   const price = productInfoData[productName].price * quantity;
 
-  // Збереження замовлення в localStorage
   const order = {
     date,
     productName,
@@ -216,7 +212,6 @@ orderForm.addEventListener("submit", function (e) {
   orders.push(order);
   localStorage.setItem("orders", JSON.stringify(orders));
 
-  // Оновлення списку замовлень
   updateOrderList();
 
   const orderSummary = `
@@ -232,11 +227,10 @@ orderForm.addEventListener("submit", function (e) {
     `;
 
   orderSummaryDetailsDiv.innerHTML = orderSummary;
-  orderForm.style.display = "none"; // Змінено з orderFormDiv на orderForm
+  orderForm.style.display = "none";
   orderSummaryDiv.style.display = "block";
 });
 
-// Оновлення списку замовлень при завантаженні сторінки
 updateOrderList();
 
 function showOrderList(arg) {
