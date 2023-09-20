@@ -1,7 +1,7 @@
 const categories = document.querySelectorAll(".category");
 const productsDiv = document.querySelector(".products");
 const productInfoDiv = document.querySelector(".product-info");
-const orderFormDiv = document.querySelector(".order-form");
+const orderFormDiv = document.querySelector(".orderform");
 const orderSummaryDiv = document.querySelector(".order-summary");
 const orderListDiv = document.querySelector(".order-list");
 const orderSummaryDetailsDiv = document.querySelector("#order-summary-details");
@@ -9,7 +9,7 @@ const orderListUl = document.querySelector("#order-list-ul");
 const orderForm = document.getElementById("order-form");
 const citySelect = document.getElementById("city");
 const cityOtherInput = document.getElementById("city-other");
-
+const categoriesContainer = document.querySelector(".categories");
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
 
 function updateOrderList() {
@@ -81,11 +81,14 @@ const productInfoData = {
   },
 };
 
-categories.forEach((category) => {
-  category.addEventListener("click", () => {
-    const categoryName = category.textContent;
-    displayProducts(categoryName);
-  });
+categoriesContainer.addEventListener("click", (e) => {
+  if (e.target && e.target.classList.contains("category")) {
+    categories.forEach((item) => {
+      if (item == e.target) {
+        displayProducts(item.textContent);
+      }
+    });
+  }
 });
 
 function displayProducts(categoryName) {
@@ -96,8 +99,16 @@ function displayProducts(categoryName) {
     productList.forEach((product) => {
       const productItem = document.createElement("div");
       productItem.textContent = product;
-      productItem.addEventListener("click", () => {
-        displayProductInfo(product);
+      productItem.classList.add("product-item");
+      productsDiv.appendChild(productItem);
+      productsDiv.addEventListener("click", (e) => {
+        if (e.target && e.target.classList.contains("product-item")) {
+          productList.forEach((item) => {
+            if (item == e.target.textContent) {
+              displayProductInfo(item);
+            }
+          });
+        }
       });
       productsDiv.appendChild(productItem);
     });
@@ -118,6 +129,7 @@ function displayProductInfo(productName) {
     productInfoDiv.appendChild(productInfoItem);
   }
 }
+
 function showOrderForm(productName, productPrice) {
   const productInfo = productInfoData[productName];
   if (productInfo) {
@@ -168,53 +180,39 @@ function deleteOrder(orderIndex) {
 orderForm.addEventListener("submit", function (e) {
   e.preventDefault();
 
-  const customerName = document.getElementById("customer-name").value;
-  const city = document.getElementById("city").value;
-  const deliveryPoint = document.getElementById("delivery-point").value;
-  const paymentMethod = document.querySelector(
-    'input[name="payment-method"]:checked'
-  ).value;
-  const quantity = parseInt(document.getElementById("quantity").value);
-  const comment = document.getElementById("comment").value;
-  const productName = document.querySelector(
-    'input[name="product-name"]'
-  ).value;
-  const otherCity = document.getElementById("city-other").value;
-  if (
-    !customerName ||
-    !city ||
-    !deliveryPoint ||
-    !paymentMethod ||
-    isNaN(quantity) ||
-    quantity <= 0
-  ) {
-    alert(
-      "Будь ласка, заповніть всі обов'язкові поля та вкажіть правильну кількість продукції."
-    );
-    return;
-  }
+  const formElements = orderForm.elements;
 
-  const date = new Date().toLocaleDateString();
-  const price = productInfoData[productName].price * quantity;
+  if (orderForm.checkValidity()) {
+    const customerName = formElements["customer-name"].value;
+    const city = formElements["city"].value;
+    const deliveryPoint = formElements["delivery-point"].value;
+    const paymentMethod = formElements["payment-method"].value;
+    const quantity = parseInt(formElements["quantity"].value);
+    const comment = formElements["comment"].value;
+    const productName = formElements["product-name"].value;
+    const otherCity = formElements["city-other"].value;
 
-  const order = {
-    date,
-    productName,
-    customerName,
-    city: city === "Інше місто" ? otherCity : city,
-    deliveryPoint,
-    paymentMethod,
-    quantity,
-    comment,
-    price,
-  };
+    const date = new Date().toLocaleDateString();
+    const price = productInfoData[productName].price * quantity;
 
-  orders.push(order);
-  localStorage.setItem("orders", JSON.stringify(orders));
+    const order = {
+      date,
+      productName,
+      customerName,
+      city: city === "Інше місто" ? otherCity : city,
+      deliveryPoint,
+      paymentMethod,
+      quantity,
+      comment,
+      price,
+    };
 
-  updateOrderList();
+    orders.push(order);
+    localStorage.setItem("orders", JSON.stringify(orders));
 
-  const orderSummary = `
+    updateOrderList();
+
+    const orderSummary = `
         <p><strong>Продукт:</strong> ${productName}</p>
         <p><strong>ПІБ покупця:</strong> ${customerName}</p>
         <p><strong>Місто:</strong> ${
@@ -226,13 +224,13 @@ orderForm.addEventListener("submit", function (e) {
         <p><strong>Коментар:</strong> ${comment}</p>
     `;
 
-  orderSummaryDetailsDiv.innerHTML = orderSummary;
-  orderForm.style.display = "none";
-  orderSummaryDiv.style.display = "block";
+    orderSummaryDetailsDiv.innerHTML = orderSummary;
+    orderFormDiv.style.display = "none";
+    orderSummaryDiv.style.display = "block";
+  }
 });
 
 updateOrderList();
-
 function showOrderList(arg) {
   let noneVal = "none";
   let blockVal = "block";
